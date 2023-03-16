@@ -1,0 +1,18 @@
+test1
+block size 1: 0.050549
+block size 1024: 0.000517
+test2
+block size 1: 0.034259
+block size 1024: 0.000131
+test3
+block size 1: 0.027879
+block size 1024: 0.000155
+test1
+block size 1: 0.030905
+block size 1024: 0.000194
+test2
+block size 1: 0.016576
+block size 1024: 0.000181
+test3
+block size 1: 0.024974
+block size 1024: 0.000182
