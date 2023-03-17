@@ -5,7 +5,8 @@ TEST=
 MAIN=dir_used_memory_all_tree.c
 
 all:
-	make main2
+	make library
+	make main
 
 library: $(LIB).c
 	$(COMP) $(CFLAGS) -c $(LIB).c
@@ -13,9 +14,6 @@ library: $(LIB).c
 
 main: $(MAIN)
 	$(COMP) $(CFLAGS) $(MAIN) -o dir_size.exe -L . $(LIB).a
-
-main2: $(MAIN)
-	$(COMP) $(CFLAGS) $(MAIN) -o dir_size.exe
 
 clean:
 	rm -f *.o *.gch *.a *.so *.exe *.test.txt

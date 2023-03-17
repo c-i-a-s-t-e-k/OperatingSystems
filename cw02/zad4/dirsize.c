@@ -24,7 +24,7 @@ long long dir_size(char* path, char* before_inform){
         }
         if(S_ISDIR(stat1.st_mode)){
             if (strcmp(dr->d_name, ".") == 0 || strcmp(dr->d_name, "..") == 0){
-                printf("%s, %d, %d\n", dr->d_name, strcmp(dr->d_name, "."), strcmp(dr->d_name, "..") );
+//                printf("%s, %d, %d\n", dr->d_name, strcmp(dr->d_name, "."), strcmp(dr->d_name, "..") );
             }
             else {
                 printf("directory: %s,   %d %d\n", dr->d_name, S_ISREG(stat1.st_mode), S_ISDIR(stat1.st_mode));
@@ -40,21 +40,21 @@ long long dir_size(char* path, char* before_inform){
     return dirr_size;
 }
 
-
-long long dirr_size;
-
-int handle_file(const char* fname, const struct stat* sbuf, int flags){
-    long size;
-    if (!S_ISDIR(sbuf->st_mode)){
-        size = ((long) sbuf->st_size);
-        printf("%s: %ld B\n", fname, size);
-        dirr_size += ((long long) size);
-    }
-    return 0;
-}
-
-long long dir_size(char *path, int n){
-    long long dir_size = 0;
-    ftw(path, handle_file, n);
-    return dir_size;
-}
+//long long dirr_size;
+//
+//int handle_file(const char* fname, const struct stat* sbuf, int flags){
+//    long size;
+//    if (!S_ISDIR(sbuf->st_mode)){
+//        size = ((long) sbuf->st_size);
+//        printf("%s: %ld B\n", fname, size);
+//        dirr_size += ((long long) size);
+//    }
+//    return 0;
+//}
+//
+//
+//long long dir_size(char *path, int n){
+//    long long dir_size = 0;
+//    ftw(path, handle_file, n);
+//    return dir_size;
+//}
