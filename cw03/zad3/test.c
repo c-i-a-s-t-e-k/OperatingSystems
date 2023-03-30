@@ -4,6 +4,6 @@
 #define MAX_LEN 255
 
 int main(){
-    find("/home/ciastek/Dokumenty/studia/SysOp", "#include");
+    find("/home/ciastek", "#include");
     exit(EXIT_SUCCESS);
 }

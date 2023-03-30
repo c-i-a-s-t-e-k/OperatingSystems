@@ -10,7 +10,6 @@ int main(int argument_count, char *arg_arr[]){
         exit(EXIT_FAILURE);
     }
     printf("%s", arg_arr[1]);
-    chdir(arg_arr[1]);
-    execl("/bin/ls", "ls", "-l",NULL);
+    execl("/bin/ls", "ls", arg_arr[1], "-l",NULL);
     exit(EXIT_SUCCESS);
 }
