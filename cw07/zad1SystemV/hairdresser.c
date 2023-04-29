@@ -1,6 +1,11 @@
-#include "hair_salon.h"
+#include "project_salon.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <sys/msg.h>
+#include <sys/shm.h>
+#include <sys/ipc.h>
+#include <unistd.h>
 
 int *times;
 
@@ -10,15 +15,12 @@ void hair_cut(int hairstyle_id){
 }
 
 // funkcja otwiera kolejke komunikatów za pomocą klucza podanego w argumęcie i czeka na odpowiednie komunikaty
-int main(int argc, char *argv[]) {
+int main() {
 //    sprawdzanie poprawnei ilości argumentów
-    if (argc < 3){
-        perror("invalids arguments number");
-        exit(EXIT_FAILURE);
-    }
-    key_t key_msq = atoi(argv[1]);
-    key_t key_shm = atoi(argv[2]);
+    key_t key_msq = ftok(project_path, PROJECT_CHAR);
+    key_t key_shm = ftok(project_path, PROJECT_CHAR);
 
+    printf("HD %d, %d\n", key_msq, key_shm);
 //    otwarcie kolejki komunikatów
     int msqid;
     if ((msqid = msgget(key_msq, IPC_EXCL)) == -1){

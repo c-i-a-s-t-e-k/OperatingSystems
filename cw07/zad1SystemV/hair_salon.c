@@ -52,18 +52,16 @@ void set_signal_handler(int signum, void (*handler)(int)){
     }
 }
 
-int create_message_queue(char *pathname, key_t* key){
-    *key = ftok(pathname, PROJECT_CHAR);
-    if ((msqid = msgget(*key, IPC_EXCL | IPC_CREAT | 0666))){
+int create_message_queue(key_t key){
+    if ((msqid = msgget(key, IPC_CREAT | 0666)) == -1){
         perror("msqget failure");
         exit(EXIT_FAILURE);
     }
     return msqid;
 }
 
-int create_shared_memory(char *pathname, key_t* key){
-    *key = ftok(pathname, PROJECT_CHAR);
-    if ((shmid = shmget(*key,sizeof(int)*HAIRSTYLES_N,IPC_EXCL | IPC_CREAT | 0666))){
+int create_shared_memory(key_t key){
+    if (-1 == (shmid = shmget(key,sizeof(int)*HAIRSTYLES_N,IPC_CREAT | 0666))){
         perror("shmget failure");
         exit(EXIT_FAILURE);
     }
@@ -82,24 +80,23 @@ void fill_shm_with_hairstyles(){
 }
 
 //tworzy procesy reprezentujące fryzjerów
-void create_hairdressers(key_t key_msq, key_t key_shm){
+void create_hairdressers(){
     int child_pid;
-    char msq_str[62];
-    char shm_str[62];
-    sprintf(msq_str, "%d", key_msq);
-    sprintf(shm_str, "%d", key_shm);
-    char *args = {"hairdresser.exe", msq_str, shm_str};
-
+    char *args[] = {"hairdresser.exe", NULL};
     for(int i =0; i < M; i++){
         child_pid = fork();
         if (child_pid == -1){
             perror("fork failure");
             exit(EXIT_FAILURE);
         } else if (child_pid == 0){
-            execvp(&args[0], &args);
-            perror("execvp failure");
-            exit(EXIT_FAILURE);
+            printf("%d\n",child_pid);
+            if(execvp(args[0], args) == -1) {
+                perror("execvp failure");
+                exit(EXIT_FAILURE);
+            }
+            exit(EXIT_SUCCESS);
         } else{
+            printf("%d\n",child_pid);
             hairdressers[i] = child_pid;
         }
     }
@@ -107,6 +104,7 @@ void create_hairdressers(key_t key_msq, key_t key_shm){
 
 
 int main(int argc, char *argv[]) {
+    printf("programme start pid:%d\n", getpid());
 //    sprawdzanie poprawnei ilości argumentów oraz ich przypisanie do zmiennych
     if (argc < 3){
         perror("invalids arguments number");
@@ -120,8 +118,13 @@ int main(int argc, char *argv[]) {
     }
     hairdressers = calloc(M, sizeof(pid_t));
     P = atoi(argv[3]);
-    key_t *key_msq;
-    key_t *key_shm;
+    if (getcwd(project_path, sizeof(project_path)) == NULL) {
+        perror("getcwd() error");
+    }
+    key_t key_msq = ftok(project_path, PROJECT_CHAR);
+    key_t key_shm = ftok(project_path, PROJECT_CHAR);
+
+
 //    ustawienie handlera do obsługi klienta
     struct sigaction new_action;
     new_action.sa_flags = SA_SIGINFO;
@@ -131,9 +134,13 @@ int main(int argc, char *argv[]) {
         perror("sigaction error");
         exit(EXIT_FAILURE);
     }
-    create_message_queue(argv[0], key_msq);
-    create_shared_memory(argv[0], key_shm);
+    create_message_queue(key_msq);
+    create_shared_memory(key_shm);
     fill_shm_with_hairstyles();
+    create_hairdressers();
 
-    printf("programme start pid:%d\n", getpid());
+
+    printf("%d, %d\n", key_msq, key_shm);
+    sleep(7);
+    handleSIGINT(SIGINT);
 }

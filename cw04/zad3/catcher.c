@@ -6,6 +6,8 @@
 
 int change_counter = -1;
 int last_mode = -1;
+int mode = 0;
+int done = 1;
 
 void handle_mode1(){
     for(int i=1; i<=100; i++){
@@ -27,12 +29,10 @@ void handle_mode3(){
 void handle_mode4(){
     time_t timer;
     struct tm * actualTime;
-    while(1) {
-        time( & timer );
-        actualTime = localtime(&timer);
-        printf("%s\n", asctime(actualTime));
-        sleep(1);
-    }
+    time( & timer );
+    actualTime = localtime(&timer);
+    printf("%s\n", asctime(actualTime));
+    sleep(1);
 }
 void handle_mode5(){
     printf("mode 5\n");
@@ -43,7 +43,7 @@ void handle_mode5(){
 void handleSIGUSR1(int signum, siginfo_t *siginfo, void *extra){
     int sig;
     if(signum == SIGUSR1){
-        printf("\nhandle start\n");
+//        printf("\nhandle start\n");
         sigset_t sigset;
         sigemptyset(&sigset);
         sigaddset(&sigset, SIGUSR1);
@@ -59,27 +59,9 @@ void handleSIGUSR1(int signum, siginfo_t *siginfo, void *extra){
             if(last_mode != siginfo->si_int){
                 change_counter++;
             }
-            switch (siginfo->si_int) {
-                case 1:
-                    handle_mode1();
-                    break;
-                case 2:
-                    handle_mode2();
-                    break;
-                case 3:
-                    handle_mode3();
-                    break;
-                case 4:
-                    handle_mode4();
-                    break;
-                case 5:
-                    handle_mode5();
-                    break;
-                default:
-                    perror("unexepected mode");
-                    break;
-            }
-            printf("\nhandle end\n");
+            mode = siginfo->si_int;
+            done = 0;
+//            printf("\nhandle end\n");
             return;
         }
     }
@@ -96,6 +78,30 @@ int main() {
         exit(EXIT_FAILURE);
     }
     while (1){
-        sleep(100);
+        if (done){
+            continue;
+        }
+        switch (mode) {
+            case 1:
+                handle_mode1();
+                break;
+            case 2:
+                handle_mode2();
+                break;
+            case 3:
+                handle_mode3();
+                break;
+            case 4:
+                handle_mode4();
+                break;
+            case 5:
+                handle_mode5();
+                break;
+            default:
+                perror("unexepected mode");
+                break;
+        }
+        if (mode != 4)
+            done = 1;
     }
 }
