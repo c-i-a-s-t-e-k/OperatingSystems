@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define ITERATIONS 16
+#define ITERATIONS 64
 
 int main()
 {

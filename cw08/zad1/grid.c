@@ -32,13 +32,17 @@ void handle_signal(int sig) {}
 void *thead_cell(void* arg) {
     int i = ((int*)arg)[0];
     int j = ((int*)arg)[1];
+    free(arg);
+
     sigset_t set;
     sigemptyset(&set);
     sigaddset(&set, SIGUSR1);
+
     struct sigaction sa;
     sa.sa_handler = handle_signal;
     sigemptyset(&sa.sa_mask);
     sa.sa_flags = 0;
+
     if (sigaction(SIGUSR1, &sa, NULL) == -1) {
         perror("SIGACTION");
     }
@@ -86,8 +90,9 @@ void init_grid(char *grid)
 {
     for (int i = 0; i < grid_width * grid_height; ++i)
         grid[i] = rand() % 2 == 0;
-    int arg[2];
+    int *arg;
     for (int i = 0; i < grid_width * grid_height; ++i){
+        arg = malloc(sizeof(int) * 2);
         arg[0] = i / grid_width;
         arg[1] = i % grid_width;
         pthread_create(&threads[i], NULL, thead_cell, arg);
